@@ -28,6 +28,7 @@ async function run() {
     await client.connect(); // ✅ Connect once
 
     const userCollection = client.db("EquiSports").collection("users");
+    const ProductCollection = client.db("EquiSports").collection("Product");
 
     // users server side
 
@@ -60,6 +61,26 @@ async function run() {
         },
       };
       const result = await userCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
+
+    // Equipment
+    app.post("/equipment", async (req, res) => {
+      const newProduct= req.body;
+      console.log("Received new user:", newProduct);
+      try {
+        const result = await ProductCollection.insertOne(newProduct);
+        res.send(result); // Must return JSON
+      } catch (dbError) {
+        console.error("DB insert error:", dbError);
+        res.status(500).send({ error: "Failed to insert user into database" });
+      }
+    });
+
+    app.get("/equipment", async (req, res) => {
+      const cursor = ProductCollection.find();
+      const result = await cursor.toArray();
       res.send(result);
     });
 
