@@ -135,6 +135,30 @@ async function run() {
       }
     });
 
+    // Delete Equipment
+    app.delete("/equipment/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).send("Invalid ID format");
+        }
+
+        const result = await ProductCollection.deleteOne({
+          _id: new ObjectId(id),
+        });
+
+        if (result.deletedCount === 0) {
+          return res.status(404).send("Equipment not found");
+        }
+
+        res.send(result);
+      } catch (error) {
+        console.error("Delete error:", error);
+        res.status(500).send("Failed to delete equipment");
+      }
+    });
+
     // Ping to verify connection
     await client.db("admin").command({ ping: 1 });
     console.log("✅ Connected to MongoDB and server is ready.");
