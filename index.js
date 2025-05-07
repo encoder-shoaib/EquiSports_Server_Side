@@ -85,7 +85,7 @@ async function run() {
       res.send(result);
     });
 
-    // Simplified equipment by ID endpoint
+    // Simplified equipment by ID
     app.get("/equipment/:id", async (req, res) => {
       try {
         const id = req.params.id;
@@ -106,6 +106,32 @@ async function run() {
       } catch (error) {
         console.error("Database error:", error);
         res.status(500).send("Failed to fetch equipment");
+      }
+    });
+
+    // Update Equipment
+    app.put("/equipment/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const updatedData = req.body;
+
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).send("Invalid ID format");
+        }
+
+        const result = await ProductCollection.updateOne(
+          { _id: new ObjectId(id) },
+          { $set: updatedData }
+        );
+
+        if (result.matchedCount === 0) {
+          return res.status(404).send("Equipment not found");
+        }
+
+        res.send(result);
+      } catch (error) {
+        console.error("Update error:", error);
+        res.status(500).send("Failed to update equipment");
       }
     });
 
