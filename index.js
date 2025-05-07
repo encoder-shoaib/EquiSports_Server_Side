@@ -85,7 +85,29 @@ async function run() {
       res.send(result);
     });
 
+    // Simplified equipment by ID endpoint
+    app.get("/equipment/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
 
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).send("Invalid equipment ID format");
+        }
+
+        const result = await ProductCollection.findOne({
+          _id: new ObjectId(id),
+        });
+
+        if (!result) {
+          return res.status(404).send("Equipment not found");
+        }
+
+        res.send(result); // Just send the raw data
+      } catch (error) {
+        console.error("Database error:", error);
+        res.status(500).send("Failed to fetch equipment");
+      }
+    });
 
     // Ping to verify connection
     await client.db("admin").command({ ping: 1 });
